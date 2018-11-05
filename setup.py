@@ -17,13 +17,10 @@ REQUIRED_PACKAGES = [
     'numpy >= 1.15.0',
     'pathos >= 0.2.2',
     'Pillow >= 5.2.0',
-    'pydensecrf >= 1.0rc3',
     'pymia == 0.1.1',
     'scikit-learn >= 0.19.2',
     'scipy >= 1.1.0',
     'SimpleITK >= 1.1.0',
-    'sphinx >= 1.7.6',
-    'sphinx_rtd_theme >= 0.4.0',
 ]
 
 TEST_PACKAGES = [
