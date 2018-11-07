@@ -3,6 +3,7 @@ import pymia.evaluation.metric as metric
 
 import numpy as np
 
+
 def init_evaluator(csv_file: str=None):
     evaluator = eval.Evaluator(eval.ConsoleEvaluatorWriter(5))
     if csv_file is not None:
