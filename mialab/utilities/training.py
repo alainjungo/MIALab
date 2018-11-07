@@ -31,10 +31,12 @@ def size_correction(params: dict):
     data = np.expand_dims(data, -1)  # for dataset convention
     return data, batch
 
+
 def init_shape(shape, id_):
     shape = list(shape)
-    shape[-1] = 1  # do to PyTorchs channel convention
+    shape[-1] = 1  # due to PyTorchs channel convention
     return np.zeros(shape, np.float32)
+
 
 def init_subject_assembler():
     return asmbl.SubjectAssembler(zero_fn=init_shape, on_sample_fn=size_correction)
