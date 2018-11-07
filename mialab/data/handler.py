@@ -1,4 +1,3 @@
-import pymia.data.transformation as pymia_tfm
 import pymia.data.extraction as pymia_extr
 import pymia.data.transformation as pymia_tfm
 import pymia.deeplearning.conversion as pymia_cnv
