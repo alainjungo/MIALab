@@ -1,8 +1,8 @@
+import typing as t
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import typing as t
-import torch.utils.data.dataloader as loader
 
 import mialab.configuration.config as cfg
 import mialab.model.base as base
