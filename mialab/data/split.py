@@ -33,5 +33,3 @@ def load_split(file_path: str):
 
     train_subjects, valid_subjects = read_dict['train'], read_dict['valid']
     return train_subjects, valid_subjects
-
-
