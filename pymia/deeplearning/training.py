@@ -107,7 +107,7 @@ class Trainer(abc.ABC):
 
                 self.logger.log_scalar('valid/loss', loss_validation, self.current_epoch)
                 logging.info('Epoch {:d}: Validation loss of {:.5f}'.format(self.current_epoch, loss_validation))
-                logging.info('Epoch {:d}: Model score of {:.5f}'.format(self.current_epoch, loss_value_of_epoch))
+                logging.info('Epoch {:d}: Model score of {:.5f}'.format(self.current_epoch, model_score))
 
                 if model_score > self.best_model_score:
                     self.best_model_score = model_score
@@ -398,7 +398,15 @@ class TorchTrainer(Trainer, abc.ABC):
         torch.manual_seed(seed)
 
     def _check_and_load_if_model_exists(self):
-        pass
+        if self.model.load(self.model_dir):
+            self.current_epoch = self.model.epoch + 1  # we save models always AFTER we finished an epoch,
+            # now we enter the next epoch
+            self.current_step = self.model.global_step  # global step is incremented AFTER we have seen a batch
+            self.best_model_score = self.model.best_model_score
+        else:
+            self.current_epoch = 1
+            self.current_step = 0
+            self.best_model_score = 0
 
     def _get_x(self, batch):
         return batch['images'].to(self.device)
