@@ -1,10 +1,10 @@
+import numpy as np
 import pymia.data.extraction as pymia_extr
 import pymia.data.transformation as pymia_tfm
 import pymia.deeplearning.conversion as pymia_cnv
 import pymia.deeplearning.data_handler as hdlr
 
 import mialab.configuration.config as cfg
-import mialab.utilities.transform as tfm
 
 
 class SliceWiseDataHandler(hdlr.DataHandler):
@@ -25,24 +25,23 @@ class SliceWiseDataHandler(hdlr.DataHandler):
 
         self.no_subjects_train = len(subjects_train)
         self.no_subjects_valid = len(subjects_valid)
-        # self.no_subjects_test = len(subjects_test)
+        self.no_subjects_test = 0
 
         # get sampler ids by subjects
         sampler_ids_train = pymia_extr.select_indices(self.dataset, pymia_extr.SubjectSelection(subjects_train))
         sampler_ids_valid = pymia_extr.select_indices(self.dataset, pymia_extr.SubjectSelection(subjects_valid))
-        # sampler_ids_test = pymia_extr.select_indices(self.dataset, pymia_extr.SubjectSelection(subjects_test))
 
         # define extractors
         self.extractor_train = pymia_extr.ComposeExtractor(
             [pymia_extr.DataExtractor(categories=('images', 'labels')),
-             pymia_extr.IndexingExtractor(),
-             pymia_extr.ImageShapeExtractor()
+             pymia_extr.IndexingExtractor(),  # for SubjectAssembler (assembling)
+             pymia_extr.ImageShapeExtractor()  # for SubjectAssembler (shape)
              ])
 
         self.extractor_valid = pymia_extr.ComposeExtractor(
             [pymia_extr.DataExtractor(categories=('images', 'labels')),
-             pymia_extr.IndexingExtractor(),
-             pymia_extr.ImageShapeExtractor()
+             pymia_extr.IndexingExtractor(),  # for SubjectAssembler (assembling)
+             pymia_extr.ImageShapeExtractor()  # for SubjectAssembler (shape)
              ])
 
         self.extractor_test = pymia_extr.ComposeExtractor(
@@ -56,13 +55,19 @@ class SliceWiseDataHandler(hdlr.DataHandler):
         self.extraction_transform_train = pymia_tfm.ComposeTransform(
             [pymia_tfm.SizeCorrection((cfg.TENSOR_WIDTH, cfg.TENSOR_HEIGHT)),
              pymia_tfm.Permute((2, 0, 1)),
-             pymia_tfm.Squeeze(entries=('labels',), squeeze_axis=0),
-             tfm.LabelsToLong(), pymia_tfm.ToTorchTensor()])
+             pymia_tfm.Squeeze(entries=('labels',), squeeze_axis=0),  # for PyTorch loss functions
+             pymia_tfm.LambdaTransform(lambda_fn=lambda np_data : np_data.astype(np.int64), entries=('labels', )),
+             # for PyTorch loss functions
+             pymia_tfm.ToTorchTensor()])
+
         self.extraction_transform_valid = pymia_tfm.ComposeTransform(
             [pymia_tfm.SizeCorrection((cfg.TENSOR_WIDTH, cfg.TENSOR_HEIGHT)),
              pymia_tfm.Permute((2, 0, 1)),
-             pymia_tfm.Squeeze(entries=('labels',), squeeze_axis=0),
-             tfm.LabelsToLong(), pymia_tfm.ToTorchTensor()])
+             pymia_tfm.Squeeze(entries=('labels',), squeeze_axis=0),  # for PyTorch loss functions
+             pymia_tfm.LambdaTransform(lambda_fn=lambda np_data : np_data.astype(np.int64), entries=('labels', )),
+             # for PyTorch loss functions
+             pymia_tfm.ToTorchTensor()])
+
         self.extraction_transform_test = None
 
         # define loaders
@@ -80,9 +85,4 @@ class SliceWiseDataHandler(hdlr.DataHandler):
                                                   collate_fn=collate_fn,
                                                   num_workers=1)
 
-        # testing_sampler = pymia_extr.SubsetSequentialSampler(sampler_ids_test)
-        # self.loader_test = pymia_extr.DataLoader(self.dataset,
-        #                                          config.batch_size_testing,
-        #                                          sampler=testing_sampler,
-        #                                          collate_fn=collate_fn,
-        #                                          num_workers=1)
+        self.loader_test = None
