@@ -1,4 +1,6 @@
 import argparse
+import logging
+import os
 
 import pymia.deeplearning.logging as log
 
@@ -19,6 +21,8 @@ def main(config_file: str):
     config.model_dir = model_dir
     config.result_dir = result_dir
     print(config)
+
+    logging.basicConfig(filename=os.path.join(config.model_dir, 'logging.log'), level=logging.INFO, filemode='a')
 
     # load train and valid subjects from split file (also test but it is unused)
     subjects_train, subjects_valid = split.load_split(config.split_file)
