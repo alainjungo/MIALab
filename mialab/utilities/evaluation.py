@@ -1,15 +1,17 @@
-import pymia.evaluation.evaluator as eval
-import pymia.evaluation.metric as metric
+import typing
+
+import pymia.evaluation.evaluator as pymia_eval
+import pymia.evaluation.metric as pymia_metric
 
 import numpy as np
 
 
 def init_evaluator(csv_file: str=None):
-    evaluator = eval.Evaluator(eval.ConsoleEvaluatorWriter(5))
+    evaluator = pymia_eval.Evaluator(pymia_eval.ConsoleEvaluatorWriter(5))
     if csv_file is not None:
-        evaluator.add_writer(eval.CSVEvaluatorWriter(csv_file))
+        evaluator.add_writer(pymia_eval.CSVEvaluatorWriter(csv_file))
     evaluator.add_writer(EvaluatorAggregator())
-    evaluator.metrics = [metric.DiceCoefficient()]
+    evaluator.metrics = [pymia_metric.DiceCoefficient()]
     evaluator.add_label(1, "WhiteMatter")
     evaluator.add_label(2, "GreyMatter")
     evaluator.add_label(3, "Hippocampus")
@@ -18,7 +20,7 @@ def init_evaluator(csv_file: str=None):
     return evaluator
 
 
-class EvaluatorAggregator(eval.IEvaluatorWriter):
+class EvaluatorAggregator(pymia_eval.IEvaluatorWriter):
 
     def __init__(self):
         self.metrics = {}
@@ -58,7 +60,7 @@ class AggregatedResult:
         self.std = std
 
 
-def aggregate_results(evaluator: eval.Evaluator) -> typing.List[AggregatedResult]:
+def aggregate_results(evaluator: pymia_eval.Evaluator) -> typing.List[AggregatedResult]:
     for writer in evaluator.writers:
         if isinstance(writer, EvaluatorAggregator):
             results = []
