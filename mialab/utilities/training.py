@@ -11,7 +11,7 @@ import SimpleITK as sitk
 
 import mialab.configuration.config as cfg
 import mialab.data.handler as hdlr
-import mialab.utilities.evaluation as eval
+import mialab.utilities.evaluation as eval_
 import mialab.utilities.filesystem as fs
 
 
@@ -50,10 +50,10 @@ def validate_on_subject_training(self: train.Trainer, subject_assembler: asmbl.S
         epoch_csv_file = os.path.join(
             epoch_result_dir,
             '{}_{}_train.csv'.format(os.path.basename(config.result_dir), self.current_epoch))
-        evaluator = eval.init_evaluator(epoch_csv_file)
+        evaluator = eval_.init_evaluator(epoch_csv_file)
 
     else:
-        evaluator = eval.init_evaluator(None)
+        evaluator = eval_.init_evaluator(None)
 
     # loop over all subjects
     print('Epoch {:d}, {} s:'.format(self.current_epoch, self.epoch_duration))
@@ -78,11 +78,11 @@ def validate_on_subject(self: train.Trainer, subject_assembler: asmbl.SubjectAss
         epoch_csv_file = os.path.join(
             epoch_result_dir,
             '{}_{}.csv'.format(os.path.basename(config.result_dir), self.current_epoch))
-        evaluator = eval.init_evaluator(epoch_csv_file)
+        evaluator = eval_.init_evaluator(epoch_csv_file)
 
     else:
         epoch_result_dir = None
-        evaluator = eval.init_evaluator(None)
+        evaluator = eval_.init_evaluator(None)
 
     # loop over all subjects
     print('Epoch {:d}, {} s:'.format(self.current_epoch, self.epoch_duration))
