@@ -49,13 +49,21 @@ class EvaluatorAggregator(eval.IEvaluatorWriter):
         self.clear()  # init results dict
 
 
-def aggregate_results(evaluator: eval.Evaluator) -> dict:
+class AggregatedResult:
+
+    def __init__(self, label: str, metric: str, mean: float, std: float):
+        self.label = label
+        self.metric = metric
+        self.mean = mean
+        self.std = std
+
+
+def aggregate_results(evaluator: eval.Evaluator) -> typing.List[AggregatedResult]:
     for writer in evaluator.writers:
         if isinstance(writer, EvaluatorAggregator):
-            results = {}
+            results = []
             for metric in writer.metrics.keys():
-                results[metric] = {}
                 for label, values in writer.results[metric].items():
-                    results[metric][label] = (np.mean(values), np.std(values))
+                    results.append(AggregatedResult(label, metric, float(np.mean(values)), float(np.std(values))))
             writer.clear()
             return results

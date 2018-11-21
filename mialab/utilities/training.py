@@ -107,17 +107,13 @@ def validate_on_subject(self: train.Trainer, subject_assembler: asmbl.SubjectAss
             sitk.WriteImage(prediction_image, os.path.join(subject_results, '{}_PREDICTION.mha'.format(subject_name)),
                             True)
 
-    # aggregate results over all subjects
-    result_dict = eval.aggregate_results(evaluator)
-    score = []
-
     # log to TensorBoard
-    for metric, results_by_label in result_dict.items():
-        for label, result in results_by_label.items():
-            self.logger.log_scalar('{}/{}-MEAN'.format(label, metric), result[0], self.current_epoch)
-            self.logger.log_scalar('{}/{}-STD'.format(label, metric), result[1], self.current_epoch)
-        if metric == 'DICE':
-            score.append(result[0])  # aggregate mean Dice coefficient for best model
+    score = []
+    for result in eval_.aggregate_results(evaluator):
+        self.logger.log_scalar('{}/{}-MEAN'.format(result.label, result.metric), result.mean, self.current_epoch)
+        self.logger.log_scalar('{}/{}-STD'.format(result.label, result.metric), result.std, self.current_epoch)
+        if result.metric == 'DICE':
+            score.append(result.mean)  # aggregate mean Dice coefficient for best model
 
     return float(np.mean(score))
 
